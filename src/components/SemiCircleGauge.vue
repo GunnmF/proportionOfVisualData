@@ -43,18 +43,8 @@
           :cy="primaryEndPoint.y"
           :r="strokeWidth / 3"
           fill="#fff"
-          class="connection-dot">
-          <animateTransform
-            attributeName="transform"
-            type="translate"
-            :values="`0,0; ${primaryEndPoint.x - centerX},${primaryEndPoint.y - centerY}; 0,0`"
-            dur="0.8s"
-            repeatCount="1"
-            calcMode="spline"
-            keySplines="0.4,0,0.2,1"
-            keyTimes="0;0.5;1"
-          />
-        </circle>
+          class="connection-dot"
+        />
         
         <!-- 第二个数据段的头部圆点 -->
         <circle
@@ -63,18 +53,8 @@
           :cy="secondaryStartPoint.y"
           :r="strokeWidth / 3"
           fill="#fff"
-          class="connection-dot">
-          <animateTransform
-            attributeName="transform"
-            type="translate"
-            :values="`0,0; ${secondaryStartPoint.x - centerX},${secondaryStartPoint.y - centerY}; 0,0`"
-            dur="0.8s"
-            repeatCount="1"
-            calcMode="spline"
-            keySplines="0.4,0,0.2,1"
-            keyTimes="0;0.5;1"
-          />
-        </circle>
+          class="connection-dot"
+        />
         
              
         <!-- Center Text -->
@@ -157,11 +137,11 @@ const secondaryPercentage = computed(() =>
 )
 
 // 计算第一个数据段（从起点开始）
-// 添加小间隙避免重叠
-const gapPercentage = 0.02 // 2% 的间隙
+// 添加间隙完全分离两个数据段
+const gapPercentage = 0.05 // 5% 的间隙，确保完全分离
 
 const primaryDashArray = computed(() => {
-  const adjustedPercentage = Math.max(0, primaryPercentage.value - gapPercentage / 2)
+  const adjustedPercentage = Math.max(0, primaryPercentage.value)
   const length = arcLength.value * adjustedPercentage
   return `${length} ${arcLength.value}`
 })
@@ -170,14 +150,14 @@ const primaryDashOffset = computed(() => 0)
 
 // 计算第二个数据段（紧接着第一个数据段）
 const secondaryDashArray = computed(() => {
-  const adjustedPercentage = Math.max(0, secondaryPercentage.value - gapPercentage / 2)
+  const adjustedPercentage = Math.max(0, secondaryPercentage.value)
   const length = arcLength.value * adjustedPercentage
   return `${length} ${arcLength.value}`
 })
 
 const secondaryDashOffset = computed(() => {
   // 第二个数据段从第一个数据段结束的地方开始，加上间隙
-  const primaryLength = arcLength.value * Math.max(0, primaryPercentage.value - gapPercentage / 2)
+  const primaryLength = arcLength.value * primaryPercentage.value
   const gap = arcLength.value * gapPercentage
   return -(primaryLength + gap)
 })
@@ -185,26 +165,22 @@ const secondaryDashOffset = computed(() => {
 // 计算连接点的位置
 const primaryEndPoint = computed(() => {
   // 第一个数据段的结束点
-  const adjustedPercentage = Math.max(0, primaryPercentage.value - gapPercentage / 2)
-  const angle = Math.PI - (Math.PI * adjustedPercentage)
+  const angle = Math.PI - (Math.PI * primaryPercentage.value)
   return polarToCartesian(centerX.value, centerY.value, radius.value, angle)
 })
 
 const secondaryStartPoint = computed(() => {
   // 第二个数据段的开始点（在第一个数据段结束后，加上间隙）
-  const primaryEndPercentage = Math.max(0, primaryPercentage.value - gapPercentage / 2)
-  const secondaryStartPercentage = primaryEndPercentage + gapPercentage
+  const secondaryStartPercentage = primaryPercentage.value + gapPercentage
   const angle = Math.PI - (Math.PI * secondaryStartPercentage)
   return polarToCartesian(centerX.value, centerY.value, radius.value, angle)
 })
 
 const secondaryEndPoint = computed(() => {
   // 第二个数据段的结束点
-  const primaryEndPercentage = Math.max(0, primaryPercentage.value - gapPercentage / 2)
-  const secondaryStartPercentage = primaryEndPercentage + gapPercentage
-  const secondaryEndPercentage = secondaryStartPercentage + Math.max(0, secondaryPercentage.value - gapPercentage / 2)
+  const secondaryStartPercentage = primaryPercentage.value + gapPercentage
+  const secondaryEndPercentage = secondaryStartPercentage + secondaryPercentage.value
   const angle = Math.PI - (Math.PI * secondaryEndPercentage)
-  return polarToCartesian(centerX.value, centerY.value, radius.value, angle)
   return polarToCartesian(centerX.value, centerY.value, radius.value, angle)
 })
 
@@ -288,7 +264,8 @@ function polarToCartesian(centerX: number, centerY: number, radius: number, angl
 
 .connection-dot {
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
-  transform-origin: center;
+  transition: cx 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+              cy 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .center-text {
