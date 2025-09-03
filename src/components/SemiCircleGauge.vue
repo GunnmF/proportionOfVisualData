@@ -143,8 +143,9 @@ const gapPercentage = 0.05 // 5% 的间隙
 const maxSinglePercentage = 0.45 // 最大45%，为另一个数据段和间隙留空间
 
 const primaryDashArray = computed(() => {
-  // 限制第一个数据段的最大占比
-  const adjustedPercentage = Math.min(Math.max(0, primaryPercentage.value), maxSinglePercentage)
+  // 第一个数据段根据自己的比例显示，但不超过总可用空间的一定比例
+  const maxAvailable = 0.9 // 最多占用90%的空间，为间隙和第二段留空间
+  const adjustedPercentage = Math.min(primaryPercentage.value, maxAvailable)
   const length = arcLength.value * adjustedPercentage
   return `${length} ${arcLength.value}`
 })
@@ -153,17 +154,17 @@ const primaryDashOffset = computed(() => 0)
 
 // 计算第二个数据段（紧接着第一个数据段）
 const secondaryDashArray = computed(() => {
-  // 计算第二个数据段可用的最大空间
-  const primaryUsed = Math.min(primaryPercentage.value, maxSinglePercentage)
-  const availableSpace = 1 - primaryUsed - gapPercentage
-  const adjustedPercentage = Math.min(Math.max(0, secondaryPercentage.value), availableSpace)
+  // 第二个数据段根据自己的比例显示
+  const primaryUsed = Math.min(primaryPercentage.value, 0.9)
+  const remainingSpace = 1 - primaryUsed - gapPercentage
+  const adjustedPercentage = Math.min(secondaryPercentage.value, remainingSpace)
   const length = arcLength.value * adjustedPercentage
   return `${length} ${arcLength.value}`
 })
 
 const secondaryDashOffset = computed(() => {
-  // 第二个数据段从第一个数据段结束的地方开始，加上间隙
-  const primaryUsed = Math.min(primaryPercentage.value, maxSinglePercentage)
+  // 第二个数据段从第一个数据段结束的地方开始，加上间隙  
+  const primaryUsed = Math.min(primaryPercentage.value, 0.9)
   const primaryLength = arcLength.value * primaryUsed
   const gap = arcLength.value * gapPercentage
   return -(primaryLength + gap)
@@ -172,14 +173,14 @@ const secondaryDashOffset = computed(() => {
 // 计算连接点的位置
 const primaryEndPoint = computed(() => {
   // 第一个数据段的结束点
-  const primaryUsed = Math.min(primaryPercentage.value, maxSinglePercentage)
+  const primaryUsed = Math.min(primaryPercentage.value, 0.9)
   const angle = Math.PI - (Math.PI * primaryUsed)
   return polarToCartesian(centerX.value, centerY.value, radius.value, angle)
 })
 
 const secondaryStartPoint = computed(() => {
   // 第二个数据段的开始点（在第一个数据段结束后，加上间隙）
-  const primaryUsed = Math.min(primaryPercentage.value, maxSinglePercentage)
+  const primaryUsed = Math.min(primaryPercentage.value, 0.9)
   const secondaryStartPercentage = primaryUsed + gapPercentage
   const angle = Math.PI - (Math.PI * secondaryStartPercentage)
   return polarToCartesian(centerX.value, centerY.value, radius.value, angle)
@@ -187,10 +188,10 @@ const secondaryStartPoint = computed(() => {
 
 const secondaryEndPoint = computed(() => {
   // 第二个数据段的结束点
-  const primaryUsed = Math.min(primaryPercentage.value, maxSinglePercentage)
+  const primaryUsed = Math.min(primaryPercentage.value, 0.9)
   const secondaryStartPercentage = primaryUsed + gapPercentage
-  const availableSpace = 1 - primaryUsed - gapPercentage
-  const secondaryUsed = Math.min(secondaryPercentage.value, availableSpace)
+  const remainingSpace = 1 - primaryUsed - gapPercentage
+  const secondaryUsed = Math.min(secondaryPercentage.value, remainingSpace)
   const secondaryEndPercentage = secondaryStartPercentage + secondaryUsed
   const angle = Math.PI - (Math.PI * secondaryEndPercentage)
   return polarToCartesian(centerX.value, centerY.value, radius.value, angle)
