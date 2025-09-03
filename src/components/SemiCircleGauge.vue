@@ -138,7 +138,7 @@ const secondaryPercentage = computed(() =>
 
 // 计算第一个数据段（从起点开始）
 // 添加间隙完全分离两个数据段
-const gapPercentage = 0.05 // 5% 的间隙，确保完全分离
+const gapPercentage = 0.08 // 5% 的间隙，确保完全分离
 
 const primaryDashArray = computed(() => {
   const adjustedPercentage = Math.max(0, primaryPercentage.value)
