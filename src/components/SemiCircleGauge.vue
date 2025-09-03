@@ -37,44 +37,7 @@
         
         <!-- 连接点圆圈 -->
         <!-- 第一个数据段的尾部圆点 -->
-        <circle
-          v-if="primaryValue > 0"
-          :cx="primaryEndPoint.x"
-          :cy="primaryEndPoint.y"
-          :r="strokeWidth / 3"
-          fill="#fff"
-          class="connection-dot">
-          <animateTransform
-            attributeName="transform"
-            type="translate"
-            :values="`0,0; ${primaryEndPoint.x - centerX},${primaryEndPoint.y - centerY}; 0,0`"
-            dur="0.8s"
-            repeatCount="1"
-            calcMode="spline"
-            keySplines="0.4,0,0.2,1"
-            keyTimes="0;0.5;1"
-          />
-        </circle>
-        
-        <!-- 第二个数据段的头部圆点 -->
-        <circle
-          v-if="secondaryValue > 0"
-          :cx="secondaryStartPoint.x"
-          :cy="secondaryStartPoint.y"
-          :r="strokeWidth / 3"
-          fill="#fff"
-          class="connection-dot">
-          <animateTransform
-            attributeName="transform"
-            type="translate"
-            :values="`0,0; ${secondaryStartPoint.x - centerX},${secondaryStartPoint.y - centerY}; 0,0`"
-            dur="0.8s"
-            repeatCount="1"
-            calcMode="spline"
-            keySplines="0.4,0,0.2,1"
-            keyTimes="0;0.5;1"
-          />
-        </circle>
+      
         
         <!-- 第二个数据段的尾部圆点 -->
         <circle
