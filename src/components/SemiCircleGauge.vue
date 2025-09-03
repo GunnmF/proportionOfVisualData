@@ -42,7 +42,7 @@
           :cx="primaryEndPoint.x"
           :cy="primaryEndPoint.y"
           :r="strokeWidth / 3"
-          :fill="primaryColor"
+          fill="#fff"
           class="connection-dot">
           <animateTransform
             attributeName="transform"
@@ -62,7 +62,7 @@
           :cx="secondaryStartPoint.x"
           :cy="secondaryStartPoint.y"
           :r="strokeWidth / 3"
-          :fill="secondaryColor"
+          fill="#fff"
           class="connection-dot">
           <animateTransform
             attributeName="transform"
