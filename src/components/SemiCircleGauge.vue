@@ -12,7 +12,16 @@
         />
         
         <!-- Data Arc 1 (Primary) -->
-     
+        <path
+          :d="primaryPath"
+          fill="none"
+          :stroke="primaryColor"
+          :stroke-width="strokeWidth"
+          stroke-linecap="round"
+          class="data-arc"
+          :stroke-dasharray="primaryDashArray"
+          :stroke-dashoffset="primaryDashOffset"
+        />
         
         <!-- Data Arc 2 (Secondary) -->
         <path
@@ -24,6 +33,27 @@
           class="data-arc"
           :stroke-dasharray="secondaryDashArray"
           :stroke-dashoffset="secondaryDashOffset"
+        />
+        
+        <!-- 连接点圆圈 -->
+        <!-- 第一个数据段的尾部圆点 -->
+        <circle
+          v-if="primaryValue > 0"
+          :cx="primaryEndPoint.x"
+          :cy="primaryEndPoint.y"
+          :r="strokeWidth / 3"
+          :fill="primaryColor"
+          class="connection-dot"
+        />
+        
+        <!-- 第二个数据段的头部圆点 -->
+        <circle
+          v-if="secondaryValue > 0"
+          :cx="secondaryStartPoint.x"
+          :cy="secondaryStartPoint.y"
+          :r="strokeWidth / 3"
+          :fill="secondaryColor"
+          class="connection-dot"
         />
         
         <!-- Center Text -->
@@ -105,7 +135,7 @@ const secondaryPercentage = computed(() =>
   totalValue.value > 0 ? props.secondaryValue / totalValue.value : 0
 )
 
-// 计算主数据弧的 dash 属性
+// 计算第一个数据段（从起点开始）
 const primaryDashArray = computed(() => {
   const length = arcLength.value * primaryPercentage.value
   return `${length} ${arcLength.value}`
@@ -113,15 +143,28 @@ const primaryDashArray = computed(() => {
 
 const primaryDashOffset = computed(() => 0)
 
-// 计算次数据弧的 dash 属性
+// 计算第二个数据段（紧接着第一个数据段）
 const secondaryDashArray = computed(() => {
   const length = arcLength.value * secondaryPercentage.value
   return `${length} ${arcLength.value}`
 })
 
 const secondaryDashOffset = computed(() => {
-  // 次数据弧需要偏移主数据弧的长度
+  // 第二个数据段从第一个数据段结束的地方开始
   return -(arcLength.value * primaryPercentage.value)
+})
+
+// 计算连接点的位置
+const primaryEndPoint = computed(() => {
+  // 第一个数据段的结束点
+  const angle = Math.PI - (Math.PI * primaryPercentage.value)
+  return polarToCartesian(centerX.value, centerY.value, radius.value, angle)
+})
+
+const secondaryStartPoint = computed(() => {
+  // 第二个数据段的开始点（与第一个数据段的结束点相同）
+  const angle = Math.PI - (Math.PI * primaryPercentage.value)
+  return polarToCartesian(centerX.value, centerY.value, radius.value, angle)
 })
 
 // Create path for background semicircle
@@ -133,7 +176,7 @@ const backgroundPath = computed(() => {
 
 // Create path for primary data arc
 const primaryPath = computed(() => {
-  // 主数据弧始终是完整的半圆路径，通过 stroke-dasharray 控制显示长度
+  // 第一个数据段的完整路径
   const startAngle = Math.PI
   const endAngle = 0
   return createArcPath(centerX.value, centerY.value, radius.value, startAngle, endAngle)
@@ -141,7 +184,7 @@ const primaryPath = computed(() => {
 
 // Create path for secondary data arc
 const secondaryPath = computed(() => {
-  // 次数据弧也是完整的半圆路径，通过 stroke-dasharray 和 stroke-dashoffset 控制显示
+  // 第二个数据段的完整路径
   const startAngle = Math.PI
   const endAngle = 0
   return createArcPath(centerX.value, centerY.value, radius.value, startAngle, endAngle)
@@ -200,6 +243,11 @@ function polarToCartesian(centerX: number, centerY: number, radius: number, angl
 .data-arc {
   transition: stroke-dasharray 0.8s cubic-bezier(0.4, 0, 0.2, 1),
               stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.connection-dot {
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
 .center-text {
