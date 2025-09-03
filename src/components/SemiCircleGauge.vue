@@ -6,7 +6,7 @@
         <path
           :d="backgroundPath"
           fill="none"
-          stroke="#f3f4f6"
+          stroke="red"
           :stroke-width="strokeWidth"
           stroke-linecap="round"
         />
