@@ -76,26 +76,7 @@
           />
         </circle>
         
-        <!-- 第二个数据段的尾部圆点 -->
-        <circle
-          v-if="secondaryValue > 0"
-          :cx="secondaryEndPoint.x"
-          :cy="secondaryEndPoint.y"
-          :r="strokeWidth / 3"
-          fill="#fff"
-          class="connection-dot">
-          <animateTransform
-            attributeName="transform"
-            type="translate"
-            :values="`0,0; ${secondaryEndPoint.x - centerX},${secondaryEndPoint.y - centerY}; 0,0`"
-            dur="0.8s"
-            repeatCount="1"
-            calcMode="spline"
-            keySplines="0.4,0,0.2,1"
-            keyTimes="0;0.5;1"
-          />
-        </circle>
-        
+             
         <!-- Center Text -->
         <g class="center-text">
           <text
