@@ -24,7 +24,16 @@
         />
         
         <!-- Data Arc 2 (Secondary) -->
-      
+        <path
+          :d="secondaryPath"
+          fill="none"
+          :stroke="secondaryColor"
+          :stroke-width="strokeWidth"
+          stroke-linecap="round"
+          class="data-arc"
+          :stroke-dasharray="secondaryDashArray"
+          :stroke-dashoffset="secondaryDashOffset"
+        />
         
         <!-- 连接点圆圈 -->
         <!-- 第一个数据段的尾部圆点 -->
@@ -36,6 +45,7 @@
           :fill="primaryColor"
           class="connection-dot"
         />
+        
         
         <!-- 第二个数据段的头部圆点 -->
         <circle
