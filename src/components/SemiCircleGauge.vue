@@ -6,22 +6,13 @@
         <path
           :d="backgroundPath"
           fill="none"
-          stroke="red"
+          stroke="#f3f4f6"
           :stroke-width="strokeWidth"
           stroke-linecap="round"
         />
         
         <!-- Data Arc 1 (Primary) -->
-        <path
-          :d="primaryPath"
-          fill="none"
-          :stroke="primaryColor"
-          :stroke-width="strokeWidth"
-          stroke-linecap="round"
-          class="data-arc"
-          :stroke-dasharray="primaryDashArray"
-          :stroke-dashoffset="primaryDashOffset"
-        />
+     
         
         <!-- Data Arc 2 (Secondary) -->
         <path
