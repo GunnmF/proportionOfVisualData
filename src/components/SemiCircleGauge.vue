@@ -18,7 +18,9 @@
           :stroke="primaryColor"
           :stroke-width="strokeWidth"
           stroke-linecap="round"
-          class="primary-arc"
+          class="data-arc"
+          :stroke-dasharray="primaryDashArray"
+          :stroke-dashoffset="primaryDashOffset"
         />
         
         <!-- Data Arc 2 (Secondary) -->
@@ -28,7 +30,9 @@
           :stroke="secondaryColor"
           :stroke-width="strokeWidth"
           stroke-linecap="round"
-          class="secondary-arc"
+          class="data-arc"
+          :stroke-dasharray="secondaryDashArray"
+          :stroke-dashoffset="secondaryDashOffset"
         />
         
         <!-- Center Text -->
@@ -100,12 +104,34 @@ const centerY = computed(() => props.size / 2)
 const totalValue = computed(() => props.primaryValue + props.secondaryValue)
 const displayValue = computed(() => totalValue.value.toString())
 
+// 计算圆弧的周长
+const arcLength = computed(() => Math.PI * radius.value)
+
 const primaryPercentage = computed(() => 
   totalValue.value > 0 ? props.primaryValue / totalValue.value : 0
 )
 const secondaryPercentage = computed(() => 
   totalValue.value > 0 ? props.secondaryValue / totalValue.value : 0
 )
+
+// 计算主数据弧的 dash 属性
+const primaryDashArray = computed(() => {
+  const length = arcLength.value * primaryPercentage.value
+  return `${length} ${arcLength.value}`
+})
+
+const primaryDashOffset = computed(() => 0)
+
+// 计算次数据弧的 dash 属性
+const secondaryDashArray = computed(() => {
+  const length = arcLength.value * secondaryPercentage.value
+  return `${length} ${arcLength.value}`
+})
+
+const secondaryDashOffset = computed(() => {
+  // 次数据弧需要偏移主数据弧的长度
+  return -(arcLength.value * primaryPercentage.value)
+})
 
 // Create path for background semicircle
 const backgroundPath = computed(() => {
@@ -116,15 +142,17 @@ const backgroundPath = computed(() => {
 
 // Create path for primary data arc
 const primaryPath = computed(() => {
-  const startAngle = Math.PI  // 从左侧开始
-  const endAngle = Math.PI * (1 - primaryPercentage.value)  // 根据占比计算结束角度
+  // 主数据弧始终是完整的半圆路径，通过 stroke-dasharray 控制显示长度
+  const startAngle = Math.PI
+  const endAngle = 0
   return createArcPath(centerX.value, centerY.value, radius.value, startAngle, endAngle)
 })
 
 // Create path for secondary data arc
 const secondaryPath = computed(() => {
-  const startAngle = Math.PI * (1 - primaryPercentage.value)  // 从主数据结束位置开始
-  const endAngle = 0  // 到右侧结束
+  // 次数据弧也是完整的半圆路径，通过 stroke-dasharray 和 stroke-dashoffset 控制显示
+  const startAngle = Math.PI
+  const endAngle = 0
   return createArcPath(centerX.value, centerY.value, radius.value, startAngle, endAngle)
 })
 
@@ -178,27 +206,9 @@ function polarToCartesian(centerX: number, centerY: number, radius: number, angl
   filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
 }
 
-.primary-arc,
-.secondary-arc {
-  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-  animation: drawArc 1.5s ease-out forwards;
-}
-
-.primary-arc {
-  animation-delay: 0.2s;
-}
-
-.secondary-arc {
-  animation-delay: 0.6s;
-}
-
-@keyframes drawArc {
-  from {
-    stroke-dasharray: 0 1000;
-  }
-  to {
-    stroke-dasharray: 1000 1000;
-  }
+.data-arc {
+  transition: stroke-dasharray 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+              stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .center-text {
